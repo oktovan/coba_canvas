@@ -11,27 +11,17 @@ http
     const canvas = createCanvas(width, height);
     const context = canvas.getContext("2d");
 
-    // context.fillStyle = '#000'
-    // context.fillRect(0, 0, width, height)
-
-    // context.font = 'bold 70pt Menlo'
-    // context.textAlign = 'center'
-    // context.textBaseline = 'top'
-    // context.fillStyle = '#3574d4'
-
-    // const text = 'Hello, World!'
-
-    // const textWidth = context.measureText(text).width
-    // context.fillRect(600 - textWidth / 2 - 10, 170 - 5, textWidth + 20, 120)
-    // context.fillStyle = '#fff'
-    // context.fillText(text, 600, 170)
-
-    // context.fillStyle = '#fff'
-    // context.font = 'bold 30pt Menlo'
-    // context.fillText('flaviocopes.com', 600, 530)
+    context.textAlign = "center";
+    const nama = "OKTOVAN REZMAN";
+    const no_ktp = "3275039393039";
+    context.fillStyle = "#fff";
 
     loadImage("./certif2.png").then((image) => {
       context.drawImage(image, 0, 0, width, height);
+      context.font = "bold 20pt Arial";
+      context.fillText(nama, 570, 445);
+      context.font = "16pt Arial";
+      context.fillText(no_ktp, 570, 513);
       const buffer = canvas.toBuffer("image/png");
       fs.writeFileSync("./test.png", buffer);
       res.write(buffer); //dd
