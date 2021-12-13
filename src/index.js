@@ -1,39 +1,50 @@
-var http = require("http");
 const { createCanvas, loadImage } = require("canvas");
 const fs = require("fs");
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const qrcode= require('qrcode');
+// const qr_image = require('qr-image');  
 
-// create a server object:
-http
-  .createServer(function (req, res) {
+app.use(bodyParser.urlencoded({extended:false}));
+app.use (bodyParser.json());
+app.use(express.static('public'));
+
+var nama = '';
+var ktp = '';
+
+app.post('/cert', (req, res) => {
+  nama = req.body.nama;
+  ktp = req.body.ktp;
+  console.log(nama+ktp);
+  loadImage("./certif2.png").then((image) => {
     const width = 1280;
     const height = 917;
-
     const canvas = createCanvas(width, height);
     const context = canvas.getContext("2d");
-
+    const qrcanvas = createCanvas(115, 115);
+    qrcode.toCanvas(qrcanvas, nama+ktp, {
+      width: 115,
+      margin: 0
+    });
     context.textAlign = "center";
-    let data = "";
-    req.on("data", (chunk) => {
-      data += chunk;
-    });
-    req.on("end", () => {
-      //console.log(JSON.parse(data).todo); // 'Buy the milk'
-      var nama = JSON.parse(data).nama;
-      var ktp = JSON.parse(data).ktp;
-      res.write(nama, ktp);
-      res.end();
-    });
-
     context.fillStyle = "#fff";
+    context.drawImage(image, 0, 0, width, height);
+    context.drawImage(qrcanvas, 827, 412, 115, 115);
+    context.font = "bold 20pt Arial";
+    context.fillText(nama, 570, 445);
+    context.font = "16pt Arial";
+    context.fillText(ktp, 570, 513);
+    const buffer = canvas.toBuffer("image/png");
+    fs.writeFileSync("./public/"+nama+ktp+".png", buffer);
+  });
+  res.send("http://116.193.190.125:3000/"+nama+ktp)
+})
 
-    // loadImage("./certif2.png").then((image) => {
-    //   context.drawImage(image, 0, 0, width, height);
-    //   context.font = "bold 20pt Arial";
-    //   context.fillText(nama, 570, 445);
-    //   context.font = "16pt Arial";
-    //   context.fillText(no_ktp, 570, 513);
-    //   const buffer = canvas.toBuffer("image/png");
-    //   fs.writeFileSync("./test.png", buffer);
-    // });
-  })
-  .listen(8080); //the server object listens on port 8080
+
+
+app.listen(3000,() => {
+  console.log('Server running');
+});
+
+  
